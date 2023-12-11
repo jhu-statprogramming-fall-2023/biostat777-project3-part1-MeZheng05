@@ -48,6 +48,7 @@ The original source of this data comes from the Wikipedia List of the verified o
 
 ```{r}
 library(here)
+
 #In this step, you must test if a directory named data exists locally. If it does not, write an R function that creates it programmatically. 
 library(tidyverse)
 
