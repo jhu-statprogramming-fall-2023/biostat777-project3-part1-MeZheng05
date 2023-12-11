@@ -47,24 +47,25 @@ The original source of this data comes from the Wikipedia List of the verified o
 # Load the data
 
 ```{r}
+install.packages("here")
 library(here)
 
 #In this step, you must test if a directory named data exists locally. If it does not, write an R function that creates it programmatically. 
 library(tidyverse)
 
-if (!dir.exists(here("data"))) {
-    dir.create(here("data"))
+if (!dir.exists(here::here("data"))) {
+    dir.create(here::here("data"))
 }
 
 # saves data only once (not each time you knit a R Markdown)
-if (!file.exists(here("data", "centenarians.rda"))) {
+if (!file.exists(here::here("data", "centenarians.rda"))) {
      tuesdata <- tidytuesdayR::tt_load("2023-05-30")
      centenarians <- tuesdata$centenarians
-     save(centenarians, file = here("data", "centenarians.rda"))
+     save(centenarians, file = here::here("data", "centenarians.rda"))
  }
 
 #Read in the data locally each time you knit/render.
-load(here("data", "centenarians.rda"))
+load(here::here("data", "centenarians.rda"))
 
 
 str(centenarians)
