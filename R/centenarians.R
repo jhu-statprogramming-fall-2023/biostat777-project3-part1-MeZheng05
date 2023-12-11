@@ -1,4 +1,4 @@
-#' centenarians dataset
+#' Data Documentation: centenarians dataset
 #'
 #' This dataset contains information about breeds.
 #'
@@ -19,4 +19,5 @@
 #' data(centenarians)
 #'
 #' @keywords datasets
+#' @docType data
 NULL
