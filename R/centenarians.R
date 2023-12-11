@@ -2,7 +2,6 @@
 #'
 #' This dataset contains information about breeds.
 #'
-#' @name centenarians
 #' @format A data frame with people who aged 110 years above.
 #'\itemize{
 #'   \item rank
@@ -14,10 +13,9 @@
 #'   \item gender
 #'   \item still_alive
 #' }
-#' @seealso Use `data(centenarians)` to load the dataset.
-#' @examples
-#' data(centenarians)
 #'
 #' @keywords datasets
+#' @name centenarians
 #' @docType data
+#'
 NULL
