@@ -67,6 +67,7 @@ load(here("data", "centenarians.rda"))
 
 
 str(centenarians)
+
 ```
 
 # Data Cleaning and Wranggling
