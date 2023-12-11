@@ -1,0 +1,18 @@
+url: ~
+template:
+  bootstrap: 5
+  bslib:
+    bg: "#202123"
+    fg: "#B8BCC2"
+    primary: "#306cc9"
+navbar:
+  right:
+    - text: "Introduction"
+      icon: fa-question-circle-o
+      href: articles/An Introduction to corrplot Package.html
+    - icon: fa-github fa-lg
+      text: "github"
+      href: https://github.com/taiyun/corrplot
+
+
+

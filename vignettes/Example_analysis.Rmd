@@ -1,0 +1,223 @@
+---
+title: "Example_analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Example_analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(corrplot)
+```
+
+
+# Question
+
+In this centenarians dataset, which includes men and women who lives/lived longer than 100 years from countries all over the world, my primary objective is to investigate potential discrepancies in life expectancy based on factors such as gender, nationality, and birth time.
+
+# Original data
+
+The data being used here is from TidyTuesday. It contains 200 known verified oldest people around the world.
+
+Please click on this [link](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-05-30/centenarians.csv) here if we want to go to the source of the csv data file.
+
+The original source of this data comes from the Wikipedia List of the verified oldest people via frankiethull on GitHub, you can read more about the information of this dataset from the [readme](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-05-30/readme.md) here.
+
+# Data Dictionary
+
+| variable                    | class     | description                                                                                                                               |
+|----------------------|------------------|--------------------------------|
+| rank                        | integer   | This person's overall rank by age.                                                                                                        |
+| name                        | character | The full name of this person.                                                                                                             |
+| birth_date                  | date      | This person's birth date.                                                                                                                 |
+| death_date                  | date      | This person's death date (or NA if still alive).                                                                                          |
+| age                         | double    | The person's age, either on the day of their death or on the day when the dataset was extracted on 2023-05-25.                            |
+| place_of_death_or_residence | character | Where the person lives now or where they were when they died.                                                                             |
+| gender                      | character | Most likely actually the sex assigned to the person at birth (the source article does not specify).                                       |
+| still_alive                 | character | Either "alive" if the person was still alive at the time when the article as referenced, or "deceased" if the person was no longer alive. |
+
+# Load the data
+
+```{r}
+library(here)
+#In this step, you must test if a directory named data exists locally. If it does not, write an R function that creates it programmatically. 
+library(tidyverse)
+
+if (!dir.exists(here("data"))) {
+    dir.create(here("data"))
+}
+
+# saves data only once (not each time you knit a R Markdown)
+if (!file.exists(here("data", "centenarians.rda"))) {
+     tuesdata <- tidytuesdayR::tt_load("2023-05-30")
+     centenarians <- tuesdata$centenarians
+     save(centenarians, file = here("data", "centenarians.rda"))
+ }
+
+#Read in the data locally each time you knit/render.
+load(here("data", "centenarians.rda"))
+
+
+str(centenarians)
+```
+
+# Data Cleaning and Wranggling
+
+```{r}
+library(dplyr)
+library(lubridate)
+library(stringr)
+library(forcats)
+centenarians <- centenarians %>% mutate(
+  country = factor(place_of_death_or_residence),
+  sex = factor(gender, labels = c("female", "male")), 
+  status = factor(still_alive, labels = c("alive", "deceased"))
+) %>%
+  select(-place_of_death_or_residence, -gender, -still_alive)
+
+#used functions
+#factor(), mutate(), select()
+
+#use map_lgl() in purrr to check if these three newly created variables are factor indeed. 
+library(purrr)
+map_lgl(.x = centenarians, .f = is.factor)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Data Analysis
+
+
+## Life Expectancy among Males and Females
+
+```{r}
+centenarians %>% group_by(sex) %>% summarise(mean_life_expectancy = sum(age)/n()) 
+#used functions
+#group_by(), summarise(), n()
+```
+
+
+The life expectancy among oldest females is higher than the life expectancy among oldest males.
+
+
+```{r, fig.height=5, fig.width=7.5}
+age_sex <- centenarians %>% group_by(sex) %>% summarise(mean_life_expectancy = sum(age)/n()) 
+age_sex <- data.frame(age_sex)
+
+library(ggplot2)
+p <- ggplot() + geom_boxplot(data = centenarians, aes(x = sex, y = age)) + geom_point(data = age_sex, aes(y = mean_life_expectancy, x = sex), shape = 18, color = "red", size = 6) + labs(title = "Life Expectancy by Sex", subtitle = "The red diamond is the calculated mean life expectancy among these two group. We can see that\nwomen has a higher mean life expectancy than men. Also, in the upper 25 percentile, women also\n have a much higher life expectancy than men.", y = "Life Expectancy", caption = "Meilin Zheng") + theme_bw()
+
+#function used 
+#geom_boxplot(), geom_point()
+
+
+
+```
+
+## Life Expectancy by Country
+
+```{r}
+centenarians %>% group_by(country) %>% summarise(total = n()) %>% mutate(country_lump = fct_lump(country, 6)) %>% group_by(country_lump) %>% summarise(total = sum(total)) %>% arrange(desc(total)) %>% head(6)
+
+#function used
+#fct_lump()
+
+```
+
+The table above gives the t6 countries with highest number of oldest people.
+
+In the table above, we can see that among the 200 oldest people, 66 of them are from the United States, and 46 of them are from Japan.
+
+By observing this table, it is still questionable whether United States and Japan have the highest number of oldest people in the world. The dataset may have a sampling bias that did not got to include oldest adult from other places around the world.
+
+However, we will still use these 6 countries for analysis since they have larger amount of samples.
+
+```{r}
+centenarians_reduced <- centenarians %>% filter(country == "United States" | country == "Japan" | country == "France" | country == "Italy" | country == "Spain" | country == "United Kingdom")
+#functions used
+#filter()
+centenarians_reduced %>% group_by(country) %>% summarise(mean_life_expectancy = sum(age)/n())
+```
+
+Among these six countries, people from France have the highest life expectancy.
+
+```{r, fig.height=5, fig.width=7.5}
+ggplot(centenarians_reduced) + geom_histogram(aes(x = age)) + geom_vline(aes(xintercept = mean(age)), color = "red", linetype = "dashed", size = 1) + theme_bw() + facet_wrap(country~.) + geom_vline(data = (centenarians_reduced %>% group_by(country) %>% summarise(mean_age = mean(age))), aes(xintercept = mean_age), color = "green", linetype = "dashed", size = 1) + labs(title = "Histogram of Life Expectancy Distribution by Countries", x = "Life Expectancy", subtitle = "The dashed red line is the grand mean among these 6 countries, whereaes the dashed green line is the\nmean life expectancy within each country. We can see that France has a higher mean life expectancy\nthan the overal mean, while the United States, Japan, and Italy have a similar mean. Spain and the\nUnited Kingdom have a slightly lower mean life expectancy than the grand mean.", caption = "Meilin Zheng")
+
+#used function
+#geom_histogram(), geom_vline(), facet.wrap()
+```
+
+
+## Life Expectancy by Birth Time
+
+```{r}
+centenarians_year <- centenarians %>% mutate(Year = year(birth_date))
+
+
+#use mapping in purr to print out the unique birth year.
+unique_year <- function(x) unique(x)
+map_dbl(.x = centenarians_year$Year, .f = unique_year)
+# all of the 200 people in the dataset are born in different years.
+
+cor <- centenarians_year %>% select(age, Year)
+cor <- data.frame(cor)
+
+cor.mtest(cor)
+#used cor.mtest()
+p <- corrplot(cor(cor))
+p
+#used corrplot()
+
+```
+
+```{r, fig.height=5, fig.width=7.5}
+centenarians_year_1900 <- centenarians_year %>% filter(Year < 1900)
+p1 <- ggplot(centenarians_year_1900) + geom_point(aes(x = Year, y = age)) + theme_bw() + labs(title = "Birth Year vs. Life Expectancy\nbefore 20th Century", subtitle = "No obious association is observed between\nbirth time and age.", caption = "Meilin Zheng", y = "Life Expectancy") + scale_y_continuous(limits = c(110, 125))
+
+centenarians_year_2000 <- centenarians_year %>% filter(Year > 1900)
+p2 <- ggplot(centenarians_year_2000) + geom_point(aes(x = Year, y = age)) + theme_bw() + labs(title = "Birth Year vs. Life Expectancy\nafter 20th Century", subtitle = "No obious association is observed between\nbirth time and age.", caption = "Meilin Zheng", y = "Life Expectancy") + scale_y_continuous(limits = c(110, 125))
+
+```
+
+# Conclusion
+
+
+In conclusion, we found that female have a higher life expectancy than male. Also, developed countries such as the United States and Japan seem to have more people with greater life expectancy. There is no obvious association observed between the time the people were born and their age. 
+
+
+# Functions being used
+
+|package | function |
+|--------|----------|
+|dplyr |`select()`, `filter()`, `mutate()`, `group_by()`, `summarise()`|
+|lubridate|`year()`|
+|forcats|`factor()`, `factor_lump()`|
+|purrr|`map_lgl()`, `map_dbl()`|
+|corrplot|`cor.mtest()`, `corrplot()`|
+|ggplot2|`geom_point()`, `geom_vline()`, `geom_boxplot()`, `geom_histogram()`, `facet_wrap()`|
+
+
+
+
+

@@ -3,6 +3,31 @@
 [![CRAN Status](https://www.r-pkg.org/badges/version/corrplot)](https://cran.r-project.org/package=corrplot)
 [![CRAN Downloads](https://cranlogs.r-pkg.org/badges/corrplot)](https://www.r-pkg.org/pkg/corrplot)
 
+# URL to the GitHub link to where the original R package came from.
+
+Please click on the [link here](https://github.com/taiyun/corrplot)/
+
+# URL to the deployed website that you will do in Part 1E
+
+https://jhu-statprogramming-fall-2023.github.io/biostat777-project3-part1-MeZheng05.
+
+
+# Description of the 5 things you customized in your pkgdown website.
+
+
+In bslib, I added bg to change the page background color to black.
+
+I also added fg for text color to be white.
+
+I also used code-bg to change the code chunk color.
+
+I added an icon in the navbar for people to easily navigate to the introduction page of the website.
+
+I also added an icon in the navbar for people to go to the original github website that has this corrplot package. 
+
+
+
+
 ## Summary
 
 R package **corrplot** provides a visual exploratory tool on correlation matrix that 
@@ -53,6 +78,29 @@ To cite `corrplot` properly, call the R built-in command
 ```r
 citation('corrplot')
 ```
+
+## List of Exported Function
+
+`COL1()` Get sequential colors
+
+`COL2()` Get diverging colors
+
+`colorlegend()` Draw color legend.
+
+`cor.mtest()` Significance test which produces p-values and confidence intervals for each pair of input features.
+
+`corrMatOrder()` Reorder a correlation matrix.
+
+`corrplot-package` Visualization of a correlation matrix
+
+`corrplot.mixed()` Using mixed methods to visualize a correlation matrix.
+
+`corrplot()` A visualization of a correlation matrix.
+
+`corrRect.hclust()` Draw rectangles on the correlation matrix graph.
+
+`corrRect()` Draw rectangle(s) on the correlation matrix graph.
+
 
 ## Reporting bugs and other issues
 
