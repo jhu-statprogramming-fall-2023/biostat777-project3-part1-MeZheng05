@@ -196,9 +196,11 @@ p
 ```{r, fig.height=5, fig.width=7.5}
 centenarians_year_1900 <- centenarians_year %>% filter(Year < 1900)
 p1 <- ggplot(centenarians_year_1900) + geom_point(aes(x = Year, y = age)) + theme_bw() + labs(title = "Birth Year vs. Life Expectancy\nbefore 20th Century", subtitle = "No obious association is observed between\nbirth time and age.", caption = "Meilin Zheng", y = "Life Expectancy") + scale_y_continuous(limits = c(110, 125))
+p1
 
 centenarians_year_2000 <- centenarians_year %>% filter(Year > 1900)
 p2 <- ggplot(centenarians_year_2000) + geom_point(aes(x = Year, y = age)) + theme_bw() + labs(title = "Birth Year vs. Life Expectancy\nafter 20th Century", subtitle = "No obious association is observed between\nbirth time and age.", caption = "Meilin Zheng", y = "Life Expectancy") + scale_y_continuous(limits = c(110, 125))
+p2
 
 ```
 
